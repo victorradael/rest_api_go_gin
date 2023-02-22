@@ -7,6 +7,7 @@ import (
 
 func HandleRequests() {
 	r := gin.Default()
+	r.GET("/api", controllers.JusReturn)
 	r.GET("/api/students", controllers.GetAllStudents)
 	r.GET("/api/students/:id", controllers.GetOneStudentById)
 	r.GET("/api/students/cpf/:cpf", controllers.SearchStudentsByCpf)

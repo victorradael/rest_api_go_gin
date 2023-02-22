@@ -8,6 +8,12 @@ import (
 	"github.com/victorradael/rest_api_go_gin/models"
 )
 
+func JusReturn(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "ok",
+	})
+}
+
 func GetAllStudents(c *gin.Context) {
 	var students []models.Student
 	database.DB.Find(&students)
@@ -46,7 +52,7 @@ func DeleteOneStudentById(c *gin.Context) {
 func UpdateOneStudentById(c *gin.Context) {
 	id := c.Params.ByName("id")
 	var student models.Student
-	database.DB.Find(&student, id)
+	database.DB.First(&student, id)
 	if student.ID == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"message": "Student not found",
@@ -55,6 +61,13 @@ func UpdateOneStudentById(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&student); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := models.ValidateStudentData(&student); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
@@ -73,6 +86,12 @@ func CreateNewStudent(c *gin.Context) {
 		})
 		return
 	}
+	if err := models.ValidateStudentData(&student); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
 	err := database.DB.Create(&student).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -80,7 +99,7 @@ func CreateNewStudent(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, student)
+	c.JSON(http.StatusCreated, student)
 
 }
 
