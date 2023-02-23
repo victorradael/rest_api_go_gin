@@ -8,7 +8,23 @@ import (
 	"github.com/victorradael/rest_api_go_gin/models"
 )
 
-func JusReturn(c *gin.Context) {
+func ShowHome(c *gin.Context) {
+	var students []models.Student
+	database.DB.Find(&students)
+	c.HTML(http.StatusOK, "index.html", gin.H{
+		"students": students,
+	})
+}
+
+func Show404(c *gin.Context) {
+	var students []models.Student
+	database.DB.Find(&students)
+	c.HTML(http.StatusNotFound, "404.html", gin.H{
+		"path": c.Request.URL,
+	})
+}
+
+func JustReturn(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",
 	})
